@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Selection Sort Simulation</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f1220;
+    color:white;
+    text-align:center;
+}
+
+h1{
+    margin-top:20px;
+    letter-spacing:1px;
+}
+
+/* Đồng hồ */
+.timer{
+    margin-top:10px;
+    font-size:22px;
+    font-weight:bold;
+    color:#00eaff;
+    font-family: "Courier New", monospace;
+}
+
+/* Khu vực mảng */
+.array{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    height:260px;
+    margin-top:30px;
+}
+
+/* Ô bằng chân nhau */
+.bar{
+    width:28px;
+    margin:0 3px;
+    background:#3498db;
+    border-radius:6px 6px 0 0;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+
+    /* CHỮ SỐ RÕ */
+    font-size:14px;
+    font-weight:700;
+    color:white;
+    padding-bottom:6px;
+
+    transition:all 0.2s ease;
+}
+
+/* Trạng thái */
+.bar.active{ background:#f1c40f; color:#000; }
+.bar.min{ background:#e74c3c; }
+.bar.sorted{ background:#2ecc71; }
+
+button{
+    margin-top:25px;
+    padding:10px 26px;
+    font-size:16px;
+    background:#9b59b6;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+button:hover{background:#8e44ad}
+</style>
+</head>
+
+<body>
+
+<h1>Selection Sort</h1>
+<div class="timer" id="timer" style=display:none>⏱ 0.000 s</div>
+
+<div class="array" id="array"></div>
+
+<button onclick="startSort()">▶ Start</button>
+
+<script>
+const SIZE = 20;
+let values = [];
+let i = 0, j = 0, minIndex = 0;
+let bars = [];
+let speed = 160; // nhanh hơn chút
+
+// TIMER
+let startTime = 0;
+let timerInterval = null;
+
+const container = document.getElementById("array");
+const timer = document.getElementById("timer");
+
+// Tạo mảng ngẫu nhiên
+function generateArray(){
+    values = [];
+    for(let k=0;k<SIZE;k++){
+        values.push(Math.floor(Math.random()*90)+10);
+    }
+}
+
+function drawArray(){
+    container.innerHTML="";
+    bars=[];
+    values.forEach(v=>{
+        const bar=document.createElement("div");
+        bar.className="bar";
+        bar.style.height = v*2 + "px";
+        bar.textContent=v;
+        container.appendChild(bar);
+        bars.push(bar);
+    });
+}
+
+generateArray();
+drawArray();
+
+function startTimer(){
+    startTime = performance.now();
+    timerInterval = setInterval(()=>{
+        const t = (performance.now() - startTime) / 1000;
+        timer.textContent = `⏱ ${t.toFixed(3)} s`;
+    }, 16);
+}
+
+function stopTimer(){
+    clearInterval(timerInterval);
+}
+
+function startSort(){
+    generateArray();
+    drawArray();
+
+    i = 0;
+    startTimer();
+    selectionStep();
+}
+
+function selectionStep(){
+    if(i >= values.length){
+        stopTimer();
+        return;
+    }
+
+    minIndex = i;
+    j = i + 1;
+
+    bars.forEach(b=>b.className="bar");
+    bars[i].classList.add("active");
+
+    setTimeout(compareStep, speed);
+}
+
+function compareStep(){
+    if(j >= values.length){
+        [values[i], values[minIndex]] = [values[minIndex], values[i]];
+        drawArray();
+        bars[i].classList.add("sorted");
+        i++;
+        setTimeout(selectionStep, speed);
+        return;
+    }
+
+    bars.forEach(b=>b.className="bar");
+    bars[i].classList.add("active");
+    bars[minIndex].classList.add("min");
+    bars[j].classList.add("active");
+
+    if(values[j] < values[minIndex]){
+        minIndex = j;
+    }
+
+    j++;
+    setTimeout(compareStep, speed);
+}
+</script>
+
+</body>
+</html>
